@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: di2win-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: di2win
+      POSTGRES_PASSWORD: di2win123
+      POSTGRES_DB: di2win_bank
+    ports:
+      - "5432:5432"
+    volumes:
+      - di2win_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  di2win_postgres_data:
