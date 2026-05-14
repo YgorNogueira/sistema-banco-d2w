@@ -2,7 +2,6 @@ services:
   postgres:
     image: postgres:16
     container_name: di2win-postgres
-    restart: always
     environment:
       POSTGRES_USER: di2win
       POSTGRES_PASSWORD: di2win123
@@ -11,6 +10,58 @@ services:
       - "5432:5432"
     volumes:
       - di2win_postgres_data:/var/lib/postgresql/data
+    networks:
+      - di2win-network
+
+  customer-service:
+    build: ./customer-service
+    container_name: customer-service
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/di2win_bank
+      SPRING_DATASOURCE_USERNAME: di2win
+      SPRING_DATASOURCE_PASSWORD: di2win123
+    ports:
+      - "8081:8081"
+    networks:
+      - di2win-network
+
+  account-service:
+    build: ./account-service
+    container_name: account-service
+    depends_on:
+      - postgres
+      - customer-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/di2win_bank
+      SPRING_DATASOURCE_USERNAME: di2win
+      SPRING_DATASOURCE_PASSWORD: di2win123
+      SERVICES_CUSTOMER_URL: http://customer-service:8081
+    ports:
+      - "8082:8082"
+    networks:
+      - di2win-network
+
+  transaction-service:
+    build: ./transaction-service
+    container_name: transaction-service
+    depends_on:
+      - postgres
+      - account-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/di2win_bank
+      SPRING_DATASOURCE_USERNAME: di2win
+      SPRING_DATASOURCE_PASSWORD: di2win123
+      SERVICES_ACCOUNT_URL: http://account-service:8082
+    ports:
+      - "8083:8083"
+    networks:
+      - di2win-network
 
 volumes:
   di2win_postgres_data:
+
+networks:
+  di2win-network:
+    driver: bridge
