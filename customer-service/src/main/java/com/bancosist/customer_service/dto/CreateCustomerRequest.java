@@ -7,14 +7,14 @@ import org.hibernate.validator.constraints.br.CPF;
 import java.time.LocalDate;
 
 public record CreateCustomerRequest(
-        @NotBlank(message = "Name is required")
+        @NotBlank(message = "Nome é obrigatório")
         String name,
 
-        @NotBlank(message = "CPF is required")
-        @CPF(message = "CPF is invalid")
+        @NotBlank(message = "CPF é obrigatório")
+        @CPF(message = "CPF é inválido")
         String cpf,
 
-        @NotNull(message = "Birth date is required")
+        @NotNull(message = "Data de nascimento é obrigatória")
         LocalDate birthDate
 ) {
 }
